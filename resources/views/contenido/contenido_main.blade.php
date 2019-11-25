@@ -45,7 +45,7 @@
     </template>
 
     <template v-if="menu==11">
-      <h1>Contenido del menu 11</h1> 
+      <h1>Contenido del menu 11</h1>
     </template>
 
     <template v-if="menu==12">
