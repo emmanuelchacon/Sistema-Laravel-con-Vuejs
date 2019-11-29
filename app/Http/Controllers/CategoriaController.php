@@ -31,12 +31,12 @@ class CategoriaController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request) //Request recibira datos desde  un formulario y lo asignara a cada campo de la tabla categorias
+    public function store(Request $request) //Request recibira datos desde  un formulario y lo guardara en cada campo de la tabla categorias
     {
         $categoria = new Categoria();
 
-        $categoria->nombre = $request->nombre;
-        $categoria->descripcion = $request->descripcion;
+        $categoria->nombre = $request->name;
+        $categoria->descripcion = $request->desc;
         $categoria->condicion = '1';
 
         $categoria->save();

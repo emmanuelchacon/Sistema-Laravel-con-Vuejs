@@ -49635,15 +49635,26 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     listarCategoria: function listarCategoria() {
       var me = this;
       axios.get('/categoria').then(function (response) {
+        //El verbo get de axios se utiliza para obtener los datos desde la BD
         // handle success
-        console.log(response);
         me.arrayCategoria = response.data;
       }).catch(function (error) {
         // handle error
         console.log(error);
       });
     },
-    registrarCategoria: function registrarCategoria() {},
+    registrarCategoria: function registrarCategoria() {
+      var me = this;
+      axios.post('/categoria/registrar', { 'name': this.nombre, 'desc': this.descripcion }).then(function (response) {
+        //el verbo set sirve para enviar datos, como primer parametro la direccion URL a la cual se enviara los datos, y como segundo los datos que se ingresaran en el formulario en forma de variables, cabe decir que las variables tienen que tener el mismo nombre
+        // En caso de que se guarden los datos en la base de datos hay que ejecutar los siguientes metodos
+        me.cerrarModal();
+        me.listarCategoria();
+      }).catch(function (error) {
+        // handle error
+        console.log(error);
+      });
+    },
     cerrarModal: function cerrarModal() {
       this.modal = 0;
       this.tituloModal = '';
@@ -49902,7 +49913,10 @@ var render = function() {
                             }
                           ],
                           staticClass: "form-control",
-                          attrs: { type: "email", placeholder: "Enter Email" },
+                          attrs: {
+                            type: "email",
+                            placeholder: "Ingrese descripcion"
+                          },
                           domProps: { value: _vm.descripcion },
                           on: {
                             input: function($event) {
@@ -49939,7 +49953,12 @@ var render = function() {
                       "button",
                       {
                         staticClass: "btn btn-primary",
-                        attrs: { type: "button" }
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.registrarCategoria()
+                          }
+                        }
                       },
                       [_vm._v("Guardar")]
                     )

@@ -108,14 +108,14 @@
                           <div class="form-group row">
                               <label class="col-md-3 form-control-label" for="email-input">Descripción</label>
                               <div class="col-md-9">
-                                  <input type="email" v-model="descripcion" class="form-control" placeholder="Enter Email">
+                                  <input type="email" v-model="descripcion" class="form-control" placeholder="Ingrese descripcion">
                               </div>
                           </div>
                       </form>
                   </div>
                   <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                      <button type="button" class="btn btn-primary" v-if="tipoAccion==1">Guardar</button>
+                      <button type="button" class="btn btn-primary" v-if="tipoAccion==1" @click="registrarCategoria()">Guardar</button>
                       <button type="button" class="btn btn-primary" v-if="tipoAccion==2">Actualizar</button>
                   </div>
               </div>
@@ -164,11 +164,10 @@
         }
       },
       methods : {
-        listarCategoria(){
+        listarCategoria(){//Obtiene los datos y los asigna al arreglo arrayCategoria
           var me = this;
-          axios.get('/categoria').then(function (response) {
+          axios.get('/categoria').then(function (response) { //El verbo get de axios se utiliza para obtener los datos desde la BD
           // handle success
-          console.log(response);
           me.arrayCategoria = response.data;
 
         })
@@ -178,16 +177,32 @@
         });
       },
 
-        registrarCategoria(){
 
+
+        registrarCategoria(){ //Guarda los datos en la BD
+          var me=this;
+          axios.post('/categoria/registrar',{'name':this.nombre,'desc':this.descripcion})
+          .then(function (response) { //el verbo post sirve para enviar datos, como primer parametro la direccion URL a la cual se enviara los datos, y como segundo los datos que se ingresaran en el formulario en forma de variables, cabe decir que las variables tienen que tener el mismo nombre de las que se recibira en el request de la funcion store del controlador
+          // En caso de que se guarden los datos en la base de datos hay que ejecutar los siguientes metodos
+          me.cerrarModal();
+          me.listarCategoria();
+        })
+        .catch(function (error) {
+          // handle error
+          console.log(error);
+        });
         },
 
-        cerrarModal(){
+
+
+        cerrarModal(){ //Cierra totalmente la ventana de registro
           this.modal=0;
           this.tituloModal='';
           this.nombre='';
           this.descripcion='';
         },
+
+
 
         abrirModal(modelo, accion, data=[]){
             switch(modelo){
