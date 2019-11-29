@@ -102,7 +102,6 @@
                               <label class="col-md-3 form-control-label" for="text-input">Nombre</label>
                               <div class="col-md-9">
                                   <input type="text" v-model="nombre" class="form-control" placeholder="Nombre de categoría">
-                                  <span class="help-block">(*) Ingrese el nombre de la categoría</span>
                               </div>
                           </div>
                           <div class="form-group row">
@@ -110,6 +109,13 @@
                               <div class="col-md-9">
                                   <input type="email" v-model="descripcion" class="form-control" placeholder="Ingrese descripcion">
                               </div>
+                          </div>
+                          <div v-show="errorCategoria==1" class="form-group row div-error">
+                            <div class="text-center text-error">
+                              <div v-for="error in errorMostrarMsjCategoria" :key="error" v-text="error">
+
+                              </div>
+                            </div>
                           </div>
                       </form>
                   </div>
@@ -160,7 +166,9 @@
           arrayCategoria:[],
           modal:0, //Esta variable indicara si mostrar o ocultar nuestra ventana modal
           tituloModal:'', //Para mostrar el titulo, si es registrar o actualizar categoria
-          tipoAccion:0 //Para que el boton diga guardar o actualizar segun la accion que hagamos
+          tipoAccion:0, //Para que el boton diga guardar o actualizar segun la accion que hagamos
+          errorCategoria:0, //Indicara si existe algun error en algun campo del formulario 0=No existe , 1=Existe
+          errorMostrarMsjCategoria:[] //Un arreglo donde se iran almacenando todos los errores que existiran en un campo
         }
       },
       methods : {
@@ -180,6 +188,9 @@
 
 
         registrarCategoria(){ //Guarda los datos en la BD
+        if(this.validarCategoria()==1){ //Si devuelve 1 entonces tengo 1 error y no guardo los datos en la BD
+          return
+        }else{ //Si no hay errores en los campos entonces se ejecuta las instrucciones para guardar los datos en la BD.
           var me=this;
           axios.post('/categoria/registrar',{'name':this.nombre,'desc':this.descripcion})
           .then(function (response) { //el verbo post sirve para enviar datos, como primer parametro la direccion URL a la cual se enviara los datos, y como segundo los datos que se ingresaran en el formulario en forma de variables, cabe decir que las variables tienen que tener el mismo nombre de las que se recibira en el request de la funcion store del controlador
@@ -191,15 +202,27 @@
           // handle error
           console.log(error);
         });
+          } //fin else
         },
 
-
+        validarCategoria(){
+          this.errorCategoria=0;
+          this.errorMostrarMsjCategoria=[];
+          if(!this.nombre){ //Si el nombre esta vacio, entonces...
+            this.errorMostrarMsjCategoria.push("EL nombre de la categoria no puede estar vacio.");
+            if(this.errorMostrarMsjCategoria.length){
+              this.errorCategoria=1;
+            }
+          }
+          return this.errorCategoria;
+        },
 
         cerrarModal(){ //Cierra totalmente la ventana de registro
           this.modal=0;
           this.tituloModal='';
           this.nombre='';
           this.descripcion='';
+          this.errorCategoria=0;
         },
 
 
@@ -220,7 +243,9 @@
                     }
                     case "actualizar":
                     {
-
+                      this.modal=1;
+                      this.tipoAccion=2;
+                      this.tituloModal="Actualizar Categoria";
                     }
                   }
 
@@ -245,5 +270,14 @@
     opacity:1 !important;
     position: absolute !important;
     background-color:#3c29297a !important;
+  }
+
+  .div-error{
+    display:flex;
+    justify-content:center;
+  }
+  .text-error{
+    color:red !important;
+    font-weight: bold;
   }
 </style>

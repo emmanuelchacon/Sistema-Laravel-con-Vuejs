@@ -49002,7 +49002,7 @@ exports = module.exports = __webpack_require__(42)(false);
 
 
 // module
-exports.push([module.i, "\n.modal-content{\n  width:100% !important;\n  position:absolute !important;\n}\n.mostrar{\n  display:list-item !important;\n  opacity:1 !important;\n  position: absolute !important;\n  background-color:#3c29297a !important;\n}\n", ""]);
+exports.push([module.i, "\n.modal-content{\n  width:100% !important;\n  position:absolute !important;\n}\n.mostrar{\n  display:list-item !important;\n  opacity:1 !important;\n  position: absolute !important;\n  background-color:#3c29297a !important;\n}\n.div-error{\n  display:flex;\n  justify-content:center;\n}\n.text-error{\n  color:red !important;\n  font-weight: bold;\n}\n", ""]);
 
 // exports
 
@@ -49617,6 +49617,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -49627,12 +49633,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       arrayCategoria: [],
       modal: 0, //Esta variable indicara si mostrar o ocultar nuestra ventana modal
       tituloModal: '', //Para mostrar el titulo, si es registrar o actualizar categoria
-      tipoAccion: 0 //Para que el boton diga guardar o actualizar segun la accion que hagamos
+      tipoAccion: 0, //Para que el boton diga guardar o actualizar segun la accion que hagamos
+      errorCategoria: 0, //Indicara si existe algun error en algun campo del formulario 0=No existe , 1=Existe
+      errorMostrarMsjCategoria: [] //Un arreglo donde se iran almacenando todos los errores que existiran en un campo
     };
   },
 
   methods: {
     listarCategoria: function listarCategoria() {
+      //Obtiene los datos y los asigna al arreglo arrayCategoria
       var me = this;
       axios.get('/categoria').then(function (response) {
         //El verbo get de axios se utiliza para obtener los datos desde la BD
@@ -49644,22 +49653,43 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       });
     },
     registrarCategoria: function registrarCategoria() {
-      var me = this;
-      axios.post('/categoria/registrar', { 'name': this.nombre, 'desc': this.descripcion }).then(function (response) {
-        //el verbo set sirve para enviar datos, como primer parametro la direccion URL a la cual se enviara los datos, y como segundo los datos que se ingresaran en el formulario en forma de variables, cabe decir que las variables tienen que tener el mismo nombre
-        // En caso de que se guarden los datos en la base de datos hay que ejecutar los siguientes metodos
-        me.cerrarModal();
-        me.listarCategoria();
-      }).catch(function (error) {
-        // handle error
-        console.log(error);
-      });
+      //Guarda los datos en la BD
+      if (this.validarCategoria() == 1) {
+        //Si devuelve 1 entonces tengo 1 error y no guardo los datos en la BD
+        return;
+      } else {
+        //Si no hay errores en los campos entonces se ejecuta las instrucciones para guardar los datos en la BD.
+        var me = this;
+        axios.post('/categoria/registrar', { 'name': this.nombre, 'desc': this.descripcion }).then(function (response) {
+          //el verbo post sirve para enviar datos, como primer parametro la direccion URL a la cual se enviara los datos, y como segundo los datos que se ingresaran en el formulario en forma de variables, cabe decir que las variables tienen que tener el mismo nombre de las que se recibira en el request de la funcion store del controlador
+          // En caso de que se guarden los datos en la base de datos hay que ejecutar los siguientes metodos
+          me.cerrarModal();
+          me.listarCategoria();
+        }).catch(function (error) {
+          // handle error
+          console.log(error);
+        });
+      } //fin else
+    },
+    validarCategoria: function validarCategoria() {
+      this.errorCategoria = 0;
+      this.errorMostrarMsjCategoria = [];
+      if (!this.nombre) {
+        //Si el nombre esta vacio, entonces...
+        this.errorMostrarMsjCategoria.push("EL nombre de la categoria no puede estar vacio.");
+        if (this.errorMostrarMsjCategoria.length) {
+          this.errorCategoria = 1;
+        }
+      }
+      return this.errorCategoria;
     },
     cerrarModal: function cerrarModal() {
+      //Cierra totalmente la ventana de registro
       this.modal = 0;
       this.tituloModal = '';
       this.nombre = '';
       this.descripcion = '';
+      this.errorCategoria = 0;
     },
     abrirModal: function abrirModal(modelo, accion) {
       var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
@@ -49678,7 +49708,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                   break;
                 }
               case "actualizar":
-                {}
+                {
+                  this.modal = 1;
+                  this.tipoAccion = 2;
+                  this.tituloModal = "Actualizar Categoria";
+                }
             }
           }
       }
@@ -49884,11 +49918,7 @@ var render = function() {
                               _vm.nombre = $event.target.value
                             }
                           }
-                        }),
-                        _vm._v(" "),
-                        _c("span", { staticClass: "help-block" }, [
-                          _vm._v("(*) Ingrese el nombre de la categoría")
-                        ])
+                        })
                       ])
                     ]),
                     _vm._v(" "),
@@ -49928,7 +49958,35 @@ var render = function() {
                           }
                         })
                       ])
-                    ])
+                    ]),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      {
+                        directives: [
+                          {
+                            name: "show",
+                            rawName: "v-show",
+                            value: _vm.errorCategoria == 1,
+                            expression: "errorCategoria==1"
+                          }
+                        ],
+                        staticClass: "form-group row div-error"
+                      },
+                      [
+                        _c(
+                          "div",
+                          { staticClass: "text-center text-error" },
+                          _vm._l(_vm.errorMostrarMsjCategoria, function(error) {
+                            return _c("div", {
+                              key: error,
+                              domProps: { textContent: _vm._s(error) }
+                            })
+                          }),
+                          0
+                        )
+                      ]
+                    )
                   ]
                 )
               ]),
