@@ -49630,6 +49630,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       //variables:
       nombre: "",
       descripcion: "",
+      categoria_id: 0,
       arrayCategoria: [],
       modal: 0, //Esta variable indicara si mostrar o ocultar nuestra ventana modal
       tituloModal: '', //Para mostrar el titulo, si es registrar o actualizar categoria
@@ -49691,8 +49692,25 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       this.descripcion = '';
       this.errorCategoria = 0;
     },
+    actualizarCategoria: function actualizarCategoria() {
+      if (this.validarCategoria() == 1) {
+        //Si devuelve 1 entonces tengo 1 error y no guardo los datos en la BD
+        return;
+      } else {
+        var me = this;
+        axios.put('/categoria/actualizar', { 'name': this.nombre, 'desc': this.descripcion, 'id': this.categoria_id }).then(function (response) {
+          //el verbo put sirve para enviar datos que se van a actualizar, como primer parametro la direccion URL a la cual se enviara los datos, y como segundo los datos que se ingresaran en el formulario en forma de variables, cabe decir que las variables tienen que tener el mismo nombre de las que se recibira en el request de la funcion store del controlador
+          // En caso de que se guarden los datos en la base de datos hay que ejecutar los siguientes metodos
+          me.cerrarModal();
+          me.listarCategoria();
+        }).catch(function (error) {
+          // handle error
+          console.log(error);
+        });
+      } //Fin del else
+    },
     abrirModal: function abrirModal(modelo, accion) {
-      var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+      var datos = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
 
       switch (modelo) {
         case "categoria":
@@ -49712,6 +49730,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                   this.modal = 1;
                   this.tipoAccion = 2;
                   this.tituloModal = "Actualizar Categoria";
+                  this.categoria_id = datos.id;
+                  this.nombre = datos.nombre;
+                  this.descripcion = datos.descripcion;
+                  break;
                 }
             }
           }
@@ -50027,7 +50049,12 @@ var render = function() {
                       "button",
                       {
                         staticClass: "btn btn-primary",
-                        attrs: { type: "button" }
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.actualizarCategoria()
+                          }
+                        }
                       },
                       [_vm._v("Actualizar")]
                     )

@@ -122,7 +122,7 @@
                   <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
                       <button type="button" class="btn btn-primary" v-if="tipoAccion==1" @click="registrarCategoria()">Guardar</button>
-                      <button type="button" class="btn btn-primary" v-if="tipoAccion==2">Actualizar</button>
+                      <button type="button" class="btn btn-primary" v-if="tipoAccion==2" @click="actualizarCategoria()">Actualizar</button>
                   </div>
               </div>
               <!-- /.modal-content -->
@@ -163,6 +163,7 @@
           //variables:
           nombre:"",
           descripcion:"",
+          categoria_id:0,
           arrayCategoria:[],
           modal:0, //Esta variable indicara si mostrar o ocultar nuestra ventana modal
           tituloModal:'', //Para mostrar el titulo, si es registrar o actualizar categoria
@@ -225,9 +226,27 @@
           this.errorCategoria=0;
         },
 
+        actualizarCategoria(){
+          if(this.validarCategoria()==1){ //Si devuelve 1 entonces tengo 1 error y no guardo los datos en la BD
+            return
+          }else{
+          var me=this;
+          axios.put('/categoria/actualizar',{'name':this.nombre,'desc':this.descripcion,'id':this.categoria_id})
+          .then(function (response) { //el verbo put sirve para enviar datos que se van a actualizar, como primer parametro la direccion URL a la cual se enviara los datos, y como segundo los datos que se ingresaran en el formulario en forma de variables, cabe decir que las variables tienen que tener el mismo nombre de las que se recibira en el request de la funcion store del controlador
+          // En caso de que se guarden los datos en la base de datos hay que ejecutar los siguientes metodos
+          me.cerrarModal();
+          me.listarCategoria();
+        })
+        .catch(function (error) {
+          // handle error
+          console.log(error);
+        });
+        }//Fin del else
+      },
 
 
-        abrirModal(modelo, accion, data=[]){
+
+        abrirModal(modelo, accion, datos=[]){
             switch(modelo){
               case "categoria":
               {
@@ -246,6 +265,10 @@
                       this.modal=1;
                       this.tipoAccion=2;
                       this.tituloModal="Actualizar Categoria";
+                      this.categoria_id=datos.id;
+                      this.nombre=datos.nombre;
+                      this.descripcion=datos.descripcion;
+                      break;
                     }
                   }
 

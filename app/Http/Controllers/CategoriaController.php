@@ -57,8 +57,8 @@ class CategoriaController extends Controller
     {
       $categoria = Categoria::findOrFail($request->id); //Buscamos el id del registro que se actualizara
 
-      $categoria->nombre = $request->nombre;
-      $categoria->descripcion = $request->descripcion;
+      $categoria->nombre = $request->name;
+      $categoria->descripcion = $request->desc;
       $categoria->condicion = '1';
 
       $categoria->save();
