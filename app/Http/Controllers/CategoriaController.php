@@ -13,14 +13,20 @@ class CategoriaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        if (!$request->ajax()){
+          return redirect("/");
+        }else{
+
         $categorias = Categoria::all(); //Una vez que importamos la clase Categoria utilizamos el elmetodo all() y le asignamos todos los datos a la variable $categoria
 
         // echo "<pre>";
         // var_dump($categorias);
         // echo "</pre>";
         return $categorias;
+
+      }
     }
 
 
@@ -33,6 +39,10 @@ class CategoriaController extends Controller
      */
     public function store(Request $request) //Request recibira datos desde  un formulario y lo guardara en cada campo de la tabla categorias
     {
+      if (!$request->ajax()){
+        return redirect("/");
+      }else{
+
         $categoria = new Categoria();
 
         $categoria->nombre = $request->name;
@@ -40,6 +50,7 @@ class CategoriaController extends Controller
         $categoria->condicion = '1';
 
         $categoria->save();
+      }
     }
 
 
@@ -55,6 +66,10 @@ class CategoriaController extends Controller
      */
     public function update(Request $request)
     {
+      if (!$request->ajax()){
+        return redirect("/");
+      }else{
+
       $categoria = Categoria::findOrFail($request->id); //Buscamos el id del registro que se actualizara
 
       $categoria->nombre = $request->name;
@@ -62,25 +77,36 @@ class CategoriaController extends Controller
       $categoria->condicion = '1';
 
       $categoria->save();
+      }
     }
 
     public function desactivar(Request $request)
     {
+      if (!$request->ajax()){
+        return redirect("/");
+      }else{
+
       $categoria = Categoria::findOrFail($request->id); //Buscamos el id del registro que se desactivara
 
       $categoria->condicion = '0';
 
       $categoria->save();
+      }
     }
-    
+
 
     public function activar(Request $request)
     {
+      if (!$request->ajax()){
+        return redirect("/");
+      }else{
+
       $categoria = Categoria::findOrFail($request->id); //Buscamos el id del registro que se activara
 
       $categoria->condicion = '1';
 
       $categoria->save();
+      }
     }
 
 
