@@ -72,6 +72,7 @@ class CategoriaController extends Controller
 
       $categoria->save();
     }
+    
 
     public function activar(Request $request)
     {
